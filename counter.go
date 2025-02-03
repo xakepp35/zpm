@@ -38,6 +38,6 @@ func (c *counter) Add(delta float64) *counter {
 	return c
 }
 
-func (c *counter) Inc() *counter {
-	return c.Add(1)
+func (c *counter) Inc(delta int) *counter {
+	return c.Add(float64(delta))
 }

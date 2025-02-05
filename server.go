@@ -12,28 +12,70 @@ var (
 	FmtTextPlain = expfmt.NewFormat(expfmt.TypeTextPlain)
 )
 
+type ServerConfig struct {
+	SortNames bool `json:"sort_names"`
+}
+
 type Server struct {
-	counters *counters
+	counters   *storage
+	gauges     *storage
+	histograms *storage
+	summaries  *storage
+
+	cfg *ServerConfig
 }
 
 func (s *Server) Counter(name string) *counter {
-	return s.counters.Counter(name)
+	return &counter{
+		name:    name,
+		storage: s.counters,
+	}
+}
+
+func (s *Server) Gauge(name string) *gauge {
+	return &gauge{
+		name:    name,
+		storage: s.gauges,
+	}
+}
+
+func (s *Server) Histogram(name string) *histogram {
+	return &histogram{
+		name:    name,
+		storage: s.histograms,
+	}
+}
+
+func (s *Server) Summary(name string) *summary {
+	return &summary{
+		name:    name,
+		storage: s.summaries,
+	}
 }
 
 func NewServer() *Server {
 	return &Server{
-		counters: NewCounters(),
+		counters:   NewStorage(),
+		gauges:     NewStorage(),
+		histograms: NewStorage(),
+		summaries:  NewStorage(),
+		cfg: &ServerConfig{
+			SortNames: false,
+		},
 	}
 }
 
 func (s *Server) SortNames(sortNames bool) *Server {
-	s.counters.sortNames = sortNames
+	s.cfg.SortNames = sortNames
 	return s
 }
 
 func (s *Server) Export(w io.Writer, expFormat expfmt.Format, opts ...expfmt.EncoderOption) error {
 	encoder := expfmt.NewEncoder(w, expFormat, opts...)
-	if err := s.counters.Encode(encoder); err != nil {
+	if err := s.counters.Encode(encoder, s.cfg.SortNames); err != nil {
+		return fmt.Errorf("counters.Encode(): %w", err)
+	}
+	if err := s.histograms.Encode(encoder, s.cfg.SortNames); err != nil {
 		return fmt.Errorf("counters.Encode(): %w", err)
 	}
 	return nil

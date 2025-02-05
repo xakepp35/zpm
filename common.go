@@ -17,20 +17,15 @@ func makeKey(name string, labels []*dto.LabelPair) string {
 	return key
 }
 
-// newMetric creates a new counter metric with labels
-func newMetricCounter(timestampMs int64, labels []*dto.LabelPair) *dto.Metric {
-	value := float64(0)
-	return &dto.Metric{
-		Label: labels,
-		Counter: &dto.Counter{
-			Value: &value,
-		},
-		TimestampMs: &timestampMs,
-	}
-}
-
 func TimestampMs() int64 {
 	return time.Now().UnixNano() / int64(time.Millisecond)
+}
+
+// atomically stores float64 newVal into x
+func AtomicSetFloat(x *float64, newVal float64) {
+	addr := (*uint64)(unsafe.Pointer(x))
+	newBits := math.Float64bits(newVal)
+	atomic.StoreUint64(addr, newBits)
 }
 
 // AtomicAddFloat is atomic float addition using CAS

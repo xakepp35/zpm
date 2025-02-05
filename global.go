@@ -24,6 +24,14 @@ func Counter(name string) *counter {
 	return gServer.Counter(name)
 }
 
-// func Histograms(name string) *counter {
-// 	return zpc.Histogram(name)
-// }
+func Gauge(name string) *gauge {
+	return gServer.Gauge(name)
+}
+
+func Histogram(name string) *histogram {
+	return gServer.Histogram(name)
+}
+
+func Summary(name string) *summary {
+	return gServer.Summary(name)
+}

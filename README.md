@@ -56,7 +56,7 @@ zpm.Histogram("http_duration_milliseconds").
     Observe(latencyMs)
 
 // summary example:
-zpm.Summary("http_duration_summary_milliseconds")
+zpm.Summary("http_duration_summary_milliseconds").
     Help("http requests duration summary").
     Quantiles(0, 0.1, 0.5, 0.9, 1).
     Label("method", r.Method).

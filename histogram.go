@@ -4,6 +4,7 @@ import (
 	"sync/atomic"
 
 	dto "github.com/prometheus/client_model/go"
+	"github.com/xakepp35/zpm/algo"
 )
 
 // Histogram client API
@@ -42,13 +43,13 @@ func (h *histogram) Buckets(buckets ...float64) *histogram {
 }
 
 func (h *histogram) Observe(value float64) *histogram {
-	metric := h.storage.demand(h.name, h.help, h.unit, h.labels, dto.MetricType_HISTOGRAM, h.initMetrics)
-	updateHistogram(metric.Histogram, value)
+	metricState := h.storage.demand(h.name, h.help, h.unit, h.labels, dto.MetricType_HISTOGRAM, h.initMetric)
+	updateHistogram(metricState.Dto.Histogram, value)
 	return h
 }
 
-func (h *histogram) initMetrics(metric *dto.Metric) {
-	metric.Histogram = &dto.Histogram{
+func (h *histogram) initMetric(metricState *state) {
+	metricState.Dto.Histogram = &dto.Histogram{
 		SampleCount: new(uint64),
 		SampleSum:   new(float64),
 		Bucket:      makeBuckets(h.buckets),
@@ -57,7 +58,7 @@ func (h *histogram) initMetrics(metric *dto.Metric) {
 
 func updateHistogram(h *dto.Histogram, value float64) {
 	atomic.AddUint64(h.SampleCount, 1)
-	AtomicAddFloat(h.SampleSum, value)
+	algo.AtomicFloatAdd(h.SampleSum, value)
 	for _, b := range h.Bucket {
 		if value <= *b.UpperBound {
 			atomic.AddUint64(b.CumulativeCount, 1)

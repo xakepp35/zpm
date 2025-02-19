@@ -2,6 +2,7 @@ package zpm
 
 import (
 	dto "github.com/prometheus/client_model/go"
+	"github.com/xakepp35/zpm/algo"
 )
 
 // Gauge client API interface
@@ -33,14 +34,14 @@ func (g *gauge) Label(key, value string) *gauge {
 }
 
 func (g *gauge) Set(value float64) *gauge {
-	metric := g.storage.demand(g.name, g.help, g.unit, g.labels, dto.MetricType_GAUGE, g.initMetric)
-	AtomicSetFloat(metric.Gauge.Value, value)
+	metricState := g.storage.demand(g.name, g.help, g.unit, g.labels, dto.MetricType_GAUGE, g.initMetric)
+	algo.AtomicFloatStore(metricState.Dto.Gauge.Value, value)
 	return g
 }
 
 func (g *gauge) Add(delta float64) *gauge {
-	metric := g.storage.demand(g.name, g.help, g.unit, g.labels, dto.MetricType_GAUGE, g.initMetric)
-	AtomicAddFloat(metric.Gauge.Value, delta)
+	metricState := g.storage.demand(g.name, g.help, g.unit, g.labels, dto.MetricType_GAUGE, g.initMetric)
+	algo.AtomicFloatAdd(metricState.Dto.Gauge.Value, delta)
 	return g
 }
 
@@ -53,8 +54,8 @@ func (g *gauge) Dec(delta int) *gauge {
 }
 
 // initMetric creates a new gauge metric with labels
-func (g *gauge) initMetric(metric *dto.Metric) {
-	metric.Gauge = &dto.Gauge{
+func (g *gauge) initMetric(metricState *state) {
+	metricState.Dto.Gauge = &dto.Gauge{
 		Value: new(float64),
 	}
 }

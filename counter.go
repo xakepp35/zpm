@@ -24,13 +24,16 @@ func (c *counter) Unit(unit string) *counter {
 	return c
 }
 
+func (c *counter) LabelPairs(labelPairs ...*LabelPair) *counter {
+	c.labels = append(c.labels, labelPairs...)
+	return c
+}
+
 func (c *counter) Label(key, value string) *counter {
-	newLabel := &dto.LabelPair{
+	return c.LabelPairs(&dto.LabelPair{
 		Name:  &key,
 		Value: &value,
-	}
-	c.labels = append(c.labels, newLabel)
-	return c
+	})
 }
 
 // Please, be careful: counter should be everincreasing value!

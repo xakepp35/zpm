@@ -27,13 +27,16 @@ func (s *summary) Unit(unit string) *summary {
 	return s
 }
 
-func (s *summary) Label(key, value string) *summary {
-	newLabel := &dto.LabelPair{
+func (c *summary) LabelPairs(labelPairs ...*LabelPair) *summary {
+	c.labels = append(c.labels, labelPairs...)
+	return c
+}
+
+func (c *summary) Label(key, value string) *summary {
+	return c.LabelPairs(&dto.LabelPair{
 		Name:  &key,
 		Value: &value,
-	}
-	s.labels = append(s.labels, newLabel)
-	return s
+	})
 }
 
 // Quantiles - please provide quantile values in ascending order!

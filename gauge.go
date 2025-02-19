@@ -24,13 +24,16 @@ func (g *gauge) Unit(unit string) *gauge {
 	return g
 }
 
-func (g *gauge) Label(key, value string) *gauge {
-	newLabel := &dto.LabelPair{
+func (c *gauge) LabelPairs(labelPairs ...*LabelPair) *gauge {
+	c.labels = append(c.labels, labelPairs...)
+	return c
+}
+
+func (c *gauge) Label(key, value string) *gauge {
+	return c.LabelPairs(&dto.LabelPair{
 		Name:  &key,
 		Value: &value,
-	}
-	g.labels = append(g.labels, newLabel)
-	return g
+	})
 }
 
 func (g *gauge) Set(value float64) *gauge {

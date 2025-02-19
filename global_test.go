@@ -36,7 +36,7 @@ func TestHistograms(t *testing.T) {
 		}()
 	}
 	wg.Wait()
-	res, err := zpm.String()
+	res, err := zpm.String(zpm.FmtTextPlain)
 	fmt.Printf("%s", res)
 	assert.NoError(t, err)
 	assert.NotEqual(t, "", res)
@@ -83,7 +83,7 @@ func TestCounters(t *testing.T) {
 		}()
 	}
 	wg.Wait()
-	res, err := zpm.String()
+	res, err := zpm.String(zpm.FmtTextPlain)
 	fmt.Printf("%s", res)
 	assert.NoError(t, err)
 	assert.NotEqual(t, "", res)

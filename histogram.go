@@ -27,13 +27,16 @@ func (h *histogram) Unit(unit string) *histogram {
 	return h
 }
 
-func (h *histogram) Label(key, value string) *histogram {
-	newLabel := &dto.LabelPair{
+func (c *histogram) LabelPairs(labelPairs ...*LabelPair) *histogram {
+	c.labels = append(c.labels, labelPairs...)
+	return c
+}
+
+func (c *histogram) Label(key, value string) *histogram {
+	return c.LabelPairs(&dto.LabelPair{
 		Name:  &key,
 		Value: &value,
-	}
-	h.labels = append(h.labels, newLabel)
-	return h
+	})
 }
 
 // Buckets - please provide sorted bucket values in ascending order!
